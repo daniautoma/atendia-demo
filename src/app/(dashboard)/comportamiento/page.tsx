@@ -26,7 +26,7 @@ export default function ComportamientoPage() {
   const [error, setError] = useState<string | null>(null);
 
   // Estados del formulario
-  const [name, setName] = useState('DentalIA');
+  const [name, setName] = useState('Valentina (Asistente Virtual Demo)');
   const [avatarUrl, setAvatarUrl] = useState('');
   const [tone, setTone] = useState('cercano');
   const [welcomeMessage, setWelcomeMessage] = useState('');

@@ -62,14 +62,14 @@ model User {
 
 model BusinessProfile {
   id              String   @id @default(cuid())
-  name            String   @default("Clínica Dental San Salvador")
-  activity        String   @default("Odontología integral y diseño de sonrisa")
-  address         String   @default("Paseo General Escalón #3700, Colonia Escalón, San Salvador")
+  name            String   @default("Atendia Demo Studio")
+  activity        String   @default("Sistema de Asistentes IA & Agendamiento Multicanal")
+  address         String   @default("Entorno de Prueba en Vivo de daniautoma")
   phone           String   @default("+503 2200 1234")
-  website         String   @default("https://dentalsansalvador.sv")
+  website         String   @default("https://demo.daniautoma.cloud")
   timezone        String   @default("America/El_Salvador")
   assistantActive Boolean  @default(true)
-  agencyName      String   @default("Agencia Atendia")
+  agencyName      String   @default("daniautoma")
   agencyLogo      String?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
@@ -77,12 +77,12 @@ model BusinessProfile {
 
 model AssistantConfig {
   id                   String   @id @default(cuid())
-  name                 String   @default("DentalIA")
+  name                 String   @default("Valentina (Asistente Virtual Demo)")
   avatarUrl            String?
   tone                 String   @default("cercano") // cercano, profesional, directo
-  welcomeMessage       String   @default("¡Hola! Bienvenido a Clínica Dental San Salvador. ¿En qué te podemos ayudar hoy?")
-  customInstructions   String   @default("Sé amable y empático. Si un paciente tiene dolor urgente, ofrécele una cita de urgencia para hoy mismo.")
-  neverDoList          String   @default("No dar diagnósticos médicos definitivos. No prometer precios sin valoración previa. No atender fuera de horario sin ofrecer cita.")
+  welcomeMessage       String   @default("¡Hola! Soy Valentina, tu asistente virtual de demostración desarrollado por daniautoma. ¿En qué te puedo ayudar hoy?")
+  customInstructions   String   @default("Eres Valentina, un asistente virtual de demostración desarrollado por daniautoma. Tu función es mostrar a los clientes potenciales cómo la inteligencia artificial puede atender consultas 24/7, calificar prospectos y agendar citas en un calendario interactivo. Responde de forma amable, clara e invita al usuario a probar las capacidades del sistema.")
+  neverDoList          String   @default("No dar información falsa. No prometer cotizaciones fijas sin evaluar requerimientos. No confirmar citas fuera de los horarios disponibles sin validarlo.")
   businessHours        Json     // Horario L-D
   outsideHoursBehavior String   @default("APPOINTMENT_OR_MESSAGE") // APPOINTMENT_OR_MESSAGE o ONLY_MESSAGE
   handoffRules         Json     // { onComplaint: true, onUrgency: true, onHumanRequest: true, onUnknownAnswer: true, customRule: "" }

@@ -34,7 +34,7 @@ export default function ProbarPage() {
     {
       id: 'welcome',
       sender: 'ASSISTANT',
-      text: '¡Hola! Bienvenido a Clínica Dental San Salvador. Soy DentalIA, tu asistente virtual. ¿En qué podemos ayudarte hoy?',
+      text: '¡Hola! Soy Valentina, tu asistente virtual de demostración desarrollado por daniautoma. ¿En qué te puedo ayudar hoy?',
       timestamp: new Date().toLocaleTimeString('es-SV', { timeZone: 'America/El_Salvador' }),
     },
   ]);
@@ -118,7 +118,7 @@ export default function ProbarPage() {
       {
         id: 'welcome_' + Date.now(),
         sender: 'ASSISTANT',
-        text: '¡Hola! Bienvenido a Clínica Dental San Salvador. Soy DentalIA, tu asistente virtual. ¿En qué podemos ayudarte hoy?',
+        text: '¡Hola! Soy Valentina, tu asistente virtual de demostración desarrollado por daniautoma. ¿En qué te puedo ayudar hoy?',
         timestamp: new Date().toLocaleTimeString('es-SV', { timeZone: 'America/El_Salvador' }),
       },
     ]);

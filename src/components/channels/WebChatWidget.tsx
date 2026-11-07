@@ -10,9 +10,9 @@ interface WebChatWidgetProps {
 }
 
 export function WebChatWidget({
-  color = '#0d9488',
-  title = 'Atención Clínica Dental San Salvador',
-  welcomeMessage = '¡Hola! ¿Tienes alguna pregunta sobre nuestros tratamientos o deseas pedir cita?',
+  color = '#2563eb',
+  title = 'Valentina | Asistente Virtual Demo',
+  welcomeMessage = '¡Hola! Soy Valentina, tu asistente virtual de demostración desarrollado por daniautoma. ¿Te gustaría agendar una cita o conocer nuestras automatizaciones?',
 }: WebChatWidgetProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Array<{ sender: 'CUSTOMER' | 'ASSISTANT'; text: string }>>([
@@ -163,7 +163,7 @@ export function WebChatWidget({
 
           {/* Pie de marca */}
           <div className="px-3 py-1.5 bg-stone-50 border-t border-stone-100 text-center text-[10px] text-stone-400">
-            Powered by <b>Atendia</b>
+            Powered by <b>daniautoma</b> • Atendia Demo Studio
           </div>
         </div>
       )}

@@ -28,9 +28,9 @@ export async function GET() {
       },
       web: {
         enabled: channelWeb?.webChatEnabled ?? true,
-        color: channelWeb?.webChatColor || '#0d9488',
-        title: channelWeb?.webChatTitle || 'Atención Clínica Dental San Salvador',
-        welcome: channelWeb?.webChatWelcome || '¡Hola! ¿En qué podemos ayudarte?',
+        color: channelWeb?.webChatColor || '#2563eb',
+        title: channelWeb?.webChatTitle || 'Valentina | Asistente Virtual Demo',
+        welcome: channelWeb?.webChatWelcome || '¡Hola! Soy Valentina de daniautoma. ¿Te gustaría agendar una cita o conocer nuestras automatizaciones?',
       },
       appUrl: process.env.APP_URL || 'http://localhost:3000',
     });

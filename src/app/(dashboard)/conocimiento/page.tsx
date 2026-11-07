@@ -32,11 +32,11 @@ export default function ConocimientoPage() {
 
   // Perfil del negocio
   const [business, setBusiness] = useState({
-    name: 'Clínica Dental San Salvador',
-    activity: 'Odontología integral y diseño de sonrisa',
-    address: 'Paseo General Escalón #3700, Colonia Escalón, San Salvador',
+    name: 'Atendia Demo Studio',
+    activity: 'Demostración de Asistente de IA Omnicanal y Agendamiento Automatizado',
+    address: 'Entorno de Prueba en Vivo de daniautoma',
     phone: '+503 2200 1234',
-    website: 'https://dentalsansalvador.sv',
+    website: 'https://demo.daniautoma.cloud',
   });
 
   // Servicios

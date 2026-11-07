@@ -4,10 +4,10 @@ import bcrypt from 'bcryptjs';
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('Iniciando semilla de datos para Atendia (El Salvador)...');
+  console.log('Iniciando semilla de datos para Atendia Demo Studio (daniautoma)...');
 
   // 1. Usuarios: Administrador y Agente de Soporte
-  const adminEmail = process.env.ADMIN_EMAIL || 'admin@atendia.local';
+  const adminEmail = process.env.ADMIN_EMAIL || 'admin@demo.daniautoma.cloud';
   const adminPassword = process.env.ADMIN_PASSWORD || 'admin1234password';
   const adminHash = await bcrypt.hash(adminPassword, 10);
 
@@ -16,14 +16,14 @@ async function main() {
     update: { passwordHash: adminHash, role: Role.ADMIN },
     create: {
       email: adminEmail,
-      name: 'Administrador Atendia',
+      name: 'Administrador Demo',
       passwordHash: adminHash,
       role: Role.ADMIN,
     },
   });
   console.log(`✓ Administrador verificado: ${admin.email}`);
 
-  const agentEmail = 'agente@atendia.local';
+  const agentEmail = 'agente@demo.daniautoma.cloud';
   const agentPassword = 'agente1234password';
   const agentHash = await bcrypt.hash(agentPassword, 10);
 
@@ -32,46 +32,48 @@ async function main() {
     update: { passwordHash: agentHash, role: Role.AGENT },
     create: {
       email: agentEmail,
-      name: 'Carlos Martínez (Agente)',
+      name: 'Carlos Martínez (Agente Demo)',
       passwordHash: agentHash,
       role: Role.AGENT,
     },
   });
   console.log(`✓ Agente de soporte verificado: ${agent.email}`);
 
-  // 2. Perfil del Negocio (Clínica Dental San Salvador)
+  // 2. Perfil del Negocio (Atendia Demo Studio - daniautoma)
   const business = await prisma.businessProfile.upsert({
     where: { id: 'default-business' },
     update: {
-      name: 'Clínica Dental San Salvador',
-      activity: 'Odontología integral y diseño de sonrisa',
-      address: 'Paseo General Escalón #3700, Colonia Escalón, San Salvador',
+      name: 'Atendia Demo Studio',
+      activity: 'Demostración de Asistente de IA Omnicanal y Agendamiento Automatizado',
+      address: 'Entorno de Prueba en Vivo de daniautoma',
       phone: '+503 2200 1234',
-      website: 'https://dentalsansalvador.sv',
+      website: 'https://demo.daniautoma.cloud',
       timezone: 'America/El_Salvador',
+      agencyName: 'daniautoma',
+      assistantActive: true,
     },
     create: {
       id: 'default-business',
-      name: 'Clínica Dental San Salvador',
-      activity: 'Odontología integral y diseño de sonrisa',
-      address: 'Paseo General Escalón #3700, Colonia Escalón, San Salvador',
+      name: 'Atendia Demo Studio',
+      activity: 'Demostración de Asistente de IA Omnicanal y Agendamiento Automatizado',
+      address: 'Entorno de Prueba en Vivo de daniautoma',
       phone: '+503 2200 1234',
-      website: 'https://dentalsansalvador.sv',
+      website: 'https://demo.daniautoma.cloud',
       timezone: 'America/El_Salvador',
       assistantActive: true,
-      agencyName: 'Agencia Atendia',
+      agencyName: 'daniautoma',
     },
   });
-  console.log(`✓ Perfil de negocio verificado: ${business.name} (${business.timezone})`);
+  console.log(`✓ Perfil de negocio verificado: ${business.name} (${business.agencyName})`);
 
-  // 3. Configuración del Asistente (DentalIA)
+  // 3. Configuración del Asistente (Valentina)
   const businessHours = {
     monday: { open: '08:00', close: '18:00', enabled: true },
     tuesday: { open: '08:00', close: '18:00', enabled: true },
     wednesday: { open: '08:00', close: '18:00', enabled: true },
     thursday: { open: '08:00', close: '18:00', enabled: true },
     friday: { open: '08:00', close: '18:00', enabled: true },
-    saturday: { open: '08:00', close: '13:00', enabled: true },
+    saturday: { open: '08:00', close: '14:00', enabled: true },
     sunday: { open: '00:00', close: '00:00', enabled: false },
   };
 
@@ -80,168 +82,107 @@ async function main() {
     onUrgency: true,
     onHumanRequest: true,
     onUnknownAnswer: true,
-    customRule: 'Si el paciente solicita un plan de financiamiento o tiene consultas complejas sobre su historial clínico.',
+    customRule: 'Si el cliente solicita un desarrollo a la medida o integración personalizada fuera del catálogo.',
   };
 
   const assistantConfig = await prisma.assistantConfig.upsert({
     where: { id: 'default-assistant' },
     update: {
-      name: 'DentalIA',
-      welcomeMessage: '¡Hola! Bienvenido a Clínica Dental San Salvador. Soy DentalIA, tu asistente virtual. ¿En qué podemos ayudarte hoy?',
-      customInstructions: 'Sé amable, cercano y profesional. Si el paciente menciona dolor agudo, inflamación o un golpe, prioriza siempre ofrecerle una cita de urgencia para el mismo día o el siguiente disponible en San Salvador.',
-      neverDoList: 'No dar diagnósticos médicos definitivos ni recetar medicamentos. No garantizar precios cerrados en tratamientos que requieran valoración clínica previa. No confirmar citas fuera del horario de la clínica sin validarlo.',
+      name: 'Valentina (Asistente Virtual Demo)',
+      avatarUrl: null,
+      tone: 'cercano',
+      welcomeMessage: '¡Hola! Soy Valentina, tu asistente virtual de demostración desarrollado por daniautoma. Estoy aquí para mostrarte cómo la IA puede atender consultas 24/7, calificar prospectos y agendar citas en tiempo real. ¿En qué puedo ayudarte hoy?',
+      customInstructions: 'Eres Valentina, un asistente virtual de demostración desarrollado por daniautoma. Tu función es mostrar a los clientes potenciales cómo la inteligencia artificial puede atender consultas 24/7, calificar prospectos y agendar citas en un calendario interactivo. Responde de forma amable, clara e invita al usuario a probar las capacidades del sistema.',
+      neverDoList: 'No dar información engañosa o no validada. No confirmar citas fuera del horario permitido sin validarlo. Mantener siempre un tono profesional, cordial y de demostración tecnológica.',
       businessHours,
       outsideHoursBehavior: 'APPOINTMENT_OR_MESSAGE',
       handoffRules,
       aiModel: 'openai/gpt-4o-mini',
       aiModelFallback: 'openai/gpt-4o-mini',
+      systemPromptOverride: null,
     },
     create: {
       id: 'default-assistant',
-      name: 'DentalIA',
+      name: 'Valentina (Asistente Virtual Demo)',
       avatarUrl: null,
       tone: 'cercano',
-      welcomeMessage: '¡Hola! Bienvenido a Clínica Dental San Salvador. Soy DentalIA, tu asistente virtual. ¿En qué podemos ayudarte hoy?',
-      customInstructions: 'Sé amable, cercano y profesional. Si el paciente menciona dolor agudo, inflamación o un golpe, prioriza siempre ofrecerle una cita de urgencia para el mismo día o el siguiente disponible en San Salvador.',
-      neverDoList: 'No dar diagnósticos médicos definitivos ni recetar medicamentos. No garantizar precios cerrados en tratamientos que requieran valoración clínica previa. No confirmar citas fuera del horario de la clínica sin validarlo.',
+      welcomeMessage: '¡Hola! Soy Valentina, tu asistente virtual de demostración desarrollado por daniautoma. Estoy aquí para mostrarte cómo la IA puede atender consultas 24/7, calificar prospectos y agendar citas en tiempo real. ¿En qué puedo ayudarte hoy?',
+      customInstructions: 'Eres Valentina, un asistente virtual de demostración desarrollado por daniautoma. Tu función es mostrar a los clientes potenciales cómo la inteligencia artificial puede atender consultas 24/7, calificar prospectos y agendar citas en un calendario interactivo. Responde de forma amable, clara e invita al usuario a probar las capacidades del sistema.',
+      neverDoList: 'No dar información engañosa o no validada. No confirmar citas fuera del horario permitido sin validarlo. Mantener siempre un tono profesional, cordial y de demostración tecnológica.',
       businessHours,
       outsideHoursBehavior: 'APPOINTMENT_OR_MESSAGE',
       handoffRules,
       aiModel: 'openai/gpt-4o-mini',
       aiModelFallback: 'openai/gpt-4o-mini',
+      systemPromptOverride: null,
     },
   });
   console.log(`✓ Asistente configurado: ${assistantConfig.name}`);
 
-  // 4. Servicios (en dólares de El Salvador - USD)
+  // 4. Servicios de demostración multipropósito
+  // Limpiar servicios anteriores si los hubiese para mantener el catálogo limpio
+  await prisma.service.deleteMany({});
+
   const services = [
     {
-      name: 'Primera Visita y Diagnóstico 3D',
-      description: 'Evaluación odontológica completa con radiografía panorámica digital y plan de tratamiento personalizado sin costo.',
-      durationMinutes: 45,
+      name: 'Consulta / Valoración Inicial (30 min)',
+      description: 'Sesión inicial de evaluación y asesoría general para conocer las necesidades de tu negocio y explorar soluciones con IA.',
+      durationMinutes: 30,
       price: 0,
       isPriceFrom: false,
       requiresEvaluation: false,
     },
     {
-      name: 'Limpieza Dental e Higiene Profunda',
-      description: 'Profilaxis con ultrasonidos, aeropulidor con bicarbonato y aplicación de flúor protector.',
+      name: 'Reserva de Cita de Servicio (45 min)',
+      description: 'Sesión personalizada de atención especializada para definir alcance y requerimientos específicos de tu empresa.',
       durationMinutes: 45,
-      price: 35,
+      price: 50,
       isPriceFrom: false,
       requiresEvaluation: false,
     },
     {
-      name: 'Blanqueamiento Dental LED',
-      description: 'Tratamiento combinado en clínica con lámpara de luz fría y férulas personalizadas para mantenimiento en casa.',
-      durationMinutes: 60,
-      price: 220,
-      isPriceFrom: true,
-      requiresEvaluation: false,
-    },
-    {
-      name: 'Ortodoncia Invisible',
-      description: 'Alineadores transparentes y removibles de última generación diseñados por computadora tras escaneo 3D intraoral.',
+      name: 'Demostración Técnica de Integración con n8n',
+      description: 'Muestrario práctico en vivo de flujos de trabajo, automatización omnicanal, webhooks y conexión con n8n.',
       durationMinutes: 45,
-      price: 1800,
-      isPriceFrom: true,
-      requiresEvaluation: true,
-    },
-    {
-      name: 'Implante Dental de Titanio',
-      description: 'Implante biocompatible con corona de zirconio sobre muñón personalizado.',
-      durationMinutes: 60,
-      price: 650,
-      isPriceFrom: true,
-      requiresEvaluation: true,
-    },
-    {
-      name: 'Resina Estética / Obturación',
-      description: 'Restauración estética de dientes con caries o fracturas leves con resina compuesta de alta estética.',
-      durationMinutes: 30,
-      price: 40,
-      isPriceFrom: true,
-      requiresEvaluation: false,
-    },
-    {
-      name: 'Endodoncia Unirradicular/Multirradicular',
-      description: 'Tratamiento de conductos radiculares para salvar piezas dentales con daño pulpar o infección.',
-      durationMinutes: 60,
-      price: 120,
-      isPriceFrom: true,
-      requiresEvaluation: true,
-    },
-    {
-      name: 'Urgencia Odontológica',
-      description: 'Atención prioritaria inmediata para alivio del dolor agudo, trauma dental o reparación de emergencia.',
-      durationMinutes: 30,
-      price: 30,
+      price: 0,
       isPriceFrom: false,
       requiresEvaluation: false,
     },
   ];
 
   for (const s of services) {
-    const existing = await prisma.service.findFirst({ where: { name: s.name } });
-    if (!existing) {
-      await prisma.service.create({ data: s });
-    } else {
-      await prisma.service.update({ where: { id: existing.id }, data: s });
-    }
+    await prisma.service.create({ data: s });
   }
-  console.log(`✓ ${services.length} servicios registrados en USD.`);
+  console.log(`✓ ${services.length} servicios de demostración registrados.`);
 
-  // 5. Preguntas Frecuentes (10 FAQs localizadas a El Salvador)
+  // 5. Preguntas Frecuentes de Demostración
+  await prisma.faq.deleteMany({});
+
   const faqs = [
     {
-      question: '¿Dónde puedo estacionar cerca de la clínica?',
-      answer: 'Disponemos de amplio estacionamiento privado y vigilado las 24 horas con seguridad justo al frente de nuestras instalaciones sobre el Paseo General Escalón, San Salvador.',
+      question: '¿Qué es Atendia Demo Studio?',
+      answer: 'Es un entorno de demostración en vivo desarrollado por daniautoma para mostrar cómo un asistente de IA atiende clientes 24/7 por WhatsApp y Web, califica prospectos y agenda citas en tiempo real.',
     },
     {
-      question: '¿Trabajan con aseguradoras o planes médicos?',
-      answer: 'Somos clínica privada independiente. Emitimos facturas detalladas y reportes médicos oficiales con número de Junta de Vigilancia para que tramites el reembolso con tu aseguradora de libre elección.',
+      question: '¿Cómo funciona la reserva de citas en tiempo real?',
+      answer: 'El asistente consulta la disponibilidad directamente en el calendario interactivo y sincroniza la cita con Google Calendar, enviando confirmaciones inmediatas por correo y WhatsApp.',
     },
     {
-      question: '¿Ofrecen opciones de financiamiento?',
-      answer: 'Sí, contamos con financiamiento hasta en 24 cuotas con tarjetas de crédito locales y planes de pago en clínica presentando tu DUI y constancia de ingresos.',
+      question: '¿Se puede integrar con plataformas como n8n o Make?',
+      answer: 'Sí. Atendia cuenta con un motor de webhooks salientes firmados con HMAC-SHA256 que disparan eventos instantáneos hacia flujos en n8n, Make o tu propio CRM.',
     },
     {
-      question: '¿El tratamiento de ortodoncia invisible duele?',
-      answer: 'No produce dolor. Podrás sentir una ligera presión los primeros 2 días tras colocarte un nuevo alineador, lo cual confirma que los dientes se están alineando con éxito.',
+      question: '¿Qué canales de mensajería están soportados?',
+      answer: 'Soporta WhatsApp con conexión dual (código QR con Baileys o API oficial empresarial con YCloud) y un Widget de Chat Web integrable en cualquier sitio web.',
     },
     {
-      question: '¿Cuánto dura una sesión de blanqueamiento dental?',
-      answer: 'La sesión en el consultorio dura unos 60 minutos con lámpara LED. Te entregamos un kit de mantenimiento para reforzar los resultados desde casa.',
-    },
-    {
-      question: '¿Qué hago si tengo una urgencia fuera del horario?',
-      answer: 'Si sufres de dolor insoportable o un golpe fuerte fuera de horario, acude de inmediato a un centro hospitalario de emergencias. Déjanos tu mensaje en este WhatsApp y a primera hora te contactaremos de manera prioritaria.',
-    },
-    {
-      question: '¿La primera cita de evaluación tiene algún costo?',
-      answer: 'La primera consulta diagnóstica, la revisión clínica intraoral y la radiografía panorámica digital son totalmente gratuitas y sin compromiso.',
-    },
-    {
-      question: '¿Atienden a niños y adolescentes?',
-      answer: 'Sí, disponemos de odontopediatras especializados que brindan una atención cálida y paciente en un ambiente relajado y amigable para los pequeños.',
-    },
-    {
-      question: '¿Cuánto tiempo toma colocarse un implante dental?',
-      answer: 'El procedimiento quirúrgico para colocar el implante toma aproximadamente 45 a 60 minutos bajo anestesia local indolora. Tras unas semanas de integración ósea, se coloca la corona definitiva.',
-    },
-    {
-      question: '¿Cómo puedo cancelar o reprogramar una cita?',
-      answer: 'Puedes solicitarlo directamente a través de este chat o llamándonos al +503 2200 1234 con al menos 24 horas de anticipación.',
+      question: '¿Cómo interviene un agente humano si es necesario?',
+      answer: 'Cuando el usuario solicita hablar con una persona o se detecta una consulta no contemplada, el asistente cede el control inmediatamente activando el modo de espera humana en el panel.',
     },
   ];
 
   for (const f of faqs) {
-    const existing = await prisma.faq.findFirst({ where: { question: f.question } });
-    if (!existing) {
-      await prisma.faq.create({ data: f });
-    } else {
-      await prisma.faq.update({ where: { id: existing.id }, data: f });
-    }
+    await prisma.faq.create({ data: f });
   }
   console.log(`✓ ${faqs.length} preguntas frecuentes registradas.`);
 
@@ -249,13 +190,13 @@ async function main() {
   await prisma.channelConfig.upsert({
     where: { type: ChannelType.WHATSAPP },
     update: {
-      waBusinessName: 'Clínica Dental San Salvador',
+      waBusinessName: 'Atendia Demo Studio',
     },
     create: {
       type: ChannelType.WHATSAPP,
       waProvider: WhatsAppProvider.BAILEYS,
       waStatus: ConnectionStatus.DISCONNECTED,
-      waBusinessName: 'Clínica Dental San Salvador',
+      waBusinessName: 'Atendia Demo Studio',
       baileysSessionDir: process.env.WHATSAPP_SESSION_DIR || './whatsapp-session',
     },
   });
@@ -263,18 +204,20 @@ async function main() {
   await prisma.channelConfig.upsert({
     where: { type: ChannelType.WEB },
     update: {
-      webChatTitle: 'Atención Clínica Dental San Salvador',
-      webChatWelcome: '¡Hola! ¿Tienes alguna pregunta sobre nuestros tratamientos odontológicos o deseas reservar cita con nuestros doctores?',
+      webChatEnabled: true,
+      webChatColor: '#2563eb',
+      webChatTitle: 'Valentina | Asistente Virtual Demo',
+      webChatWelcome: '¡Hola! Soy Valentina, asistente virtual de demostración desarrollado por daniautoma. ¿Te gustaría agendar una cita o conocer nuestras automatizaciones?',
     },
     create: {
       type: ChannelType.WEB,
       webChatEnabled: true,
-      webChatColor: '#0d9488',
-      webChatTitle: 'Atención Clínica Dental San Salvador',
-      webChatWelcome: '¡Hola! ¿Tienes alguna pregunta sobre nuestros tratamientos odontológicos o deseas reservar cita con nuestros doctores?',
+      webChatColor: '#2563eb',
+      webChatTitle: 'Valentina | Asistente Virtual Demo',
+      webChatWelcome: '¡Hola! Soy Valentina, asistente virtual de demostración desarrollado por daniautoma. ¿Te gustaría agendar una cita o conocer nuestras automatizaciones?',
     },
   });
-  console.log('✓ Canales de WhatsApp y Web Chat inicializados.');
+  console.log('✓ Canales de WhatsApp y Web Chat inicializados con tema azul moderno.');
 
   // 7. Integraciones
   const integrations = [
@@ -300,15 +243,18 @@ async function main() {
   }
   console.log('✓ 6 integraciones del catálogo inicializadas.');
 
-  // 8. Contacto y Conversaciones de ejemplo (El Salvador +503)
+  // 8. Contacto y Conversaciones de ejemplo
   const contact1 = await prisma.contact.upsert({
     where: { phone: '+50371234567' },
-    update: {},
+    update: {
+      name: 'Elena Rodríguez',
+      notes: 'Interesada en demostración de automatización con n8n y agendamiento IA.',
+    },
     create: {
       name: 'Elena Rodríguez',
       phone: '+50371234567',
       email: 'elena.rodriguez@ejemplo.com',
-      notes: 'Interesada en valoración de ortodoncia invisible en San Salvador.',
+      notes: 'Interesada en demostración de automatización con n8n y agendamiento IA.',
     },
   });
 
@@ -318,7 +264,7 @@ async function main() {
     create: {
       id: 'sample-conv-1',
       contactId: contact1.id,
-      channel: ChannelType.WHATSAPP,
+      channel: ChannelType.WEB,
       waProvider: WhatsAppProvider.BAILEYS,
       status: ConversationStatus.BOT_ACTIVE,
       lastMessageAt: new Date(),
@@ -332,19 +278,19 @@ async function main() {
         {
           conversationId: conv1.id,
           sender: MessageSender.CUSTOMER,
-          text: 'Buenas tardes, quería consultar información sobre la ortodoncia invisible.',
+          text: 'Hola, me gustaría agendar una sesión de demostración de integración con n8n.',
           createdAt: new Date(Date.now() - 3600000 * 2),
         },
         {
           conversationId: conv1.id,
           sender: MessageSender.ASSISTANT,
-          text: '¡Hola Elena! En Clínica Dental San Salvador trabajamos con alineadores transparentes y removibles hechos a la medida. La primera visita diagnóstica con escaneo 3D es totalmente gratuita. ¿Te gustaría agendar una cita para que el ortodoncista evalúe tu caso?',
+          text: '¡Hola Elena! Con gusto. En Atendia Demo Studio contamos con la sesión "Demostración Técnica de Integración con n8n" de 45 minutos sin costo. ¿Qué día y horario te conviene para coordinar la cita?',
           createdAt: new Date(Date.now() - 3600000 * 2 + 10000),
         },
         {
           conversationId: conv1.id,
           sender: MessageSender.CUSTOMER,
-          text: 'Sí, por favor. ¿Tienen disponibilidad el próximo martes por la tarde?',
+          text: '¿Tienen espacio este próximo jueves por la mañana?',
           createdAt: new Date(Date.now() - 3600000),
         },
       ],

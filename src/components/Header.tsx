@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Power, Clock, Menu } from 'lucide-react';
+import { Power, Clock, Menu, Sparkles } from 'lucide-react';
 import { useMobileNav } from '@/components/MobileNavContext';
 
 interface HeaderProps {
@@ -82,6 +82,12 @@ export function Header({ title, subtitle, actions }: HeaderProps) {
       </div>
 
       <div className="flex items-center gap-2 sm:gap-4 shrink-0">
+        {/* Marca de agua / aviso en modo demo */}
+        <div className="hidden xl:flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-xs font-medium">
+          <Sparkles className="w-3.5 h-3.5 text-blue-600" />
+          <span>Entorno de Prueba en Vivo de daniautoma</span>
+        </div>
+
         {/* Hora oficial en El Salvador */}
         <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-stone-100 text-stone-600 text-xs font-mono">
           <Clock className="w-3.5 h-3.5 text-stone-400" />

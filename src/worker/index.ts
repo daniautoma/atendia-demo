@@ -182,12 +182,12 @@ async function handleInboundMessageJob(payload: {
   ]);
 
   const systemPrompt = buildSystemPrompt({
-    assistantName: assistant?.name || 'DentalIA',
-    businessName: business?.name || 'Clínica Dental San Salvador',
-    activity: business?.activity || 'Odontología integral y diseño de sonrisa',
-    address: business?.address || 'Paseo General Escalón #3700, San Salvador',
+    assistantName: assistant?.name || 'Valentina (Asistente Virtual Demo)',
+    businessName: business?.name || 'Atendia Demo Studio',
+    activity: business?.activity || 'Demostración de Asistente de IA Omnicanal y Agendamiento Automatizado',
+    address: business?.address || 'Entorno de Prueba en Vivo de daniautoma',
     phone: business?.phone || '+503 2200 1234',
-    website: business?.website || 'https://dentalsansalvador.sv',
+    website: business?.website || 'https://demo.daniautoma.cloud',
     timezone: business?.timezone || 'America/El_Salvador',
     tone: assistant?.tone || 'cercano',
     welcomeMessage: assistant?.welcomeMessage || '',
@@ -329,7 +329,7 @@ async function handleInboundMessageJob(payload: {
     waLid: conversation.contact?.waLid || undefined,
   });
 
-  console.log(`[Worker] Respuesta de DentalIA enviada a ${conversation.contact?.waLid || to} (${executedTools.length} tools usadas)`);
+  console.log(`[Worker] Respuesta de Valentina enviada a ${conversation.contact?.waLid || to} (${executedTools.length} tools usadas)`);
 }
 
 /**
@@ -362,7 +362,7 @@ async function checkUpcomingAppointments() {
           minute: '2-digit',
         });
 
-        const reminderText = `Hola ${appt.contact.name || ''}, te recordamos tu cita de mañana para ${appt.serviceName} a las ${dateStr} en Clínica Dental San Salvador (Paseo General Escalón #3700). Si necesitas reprogramarla o cancelarla, avísanos por este medio. ¡Te esperamos!`;
+        const reminderText = `Hola ${appt.contact.name || ''}, te recordamos tu cita de mañana para ${appt.serviceName} a las ${dateStr} en Atendia Demo Studio. Si necesitas reprogramarla o cancelarla, avísanos por este medio. ¡Te esperamos!`;
 
         await adapter.sendMessage({
           to: appt.contact.phone,
@@ -447,7 +447,7 @@ async function handleDailySummaryJob() {
     const htmlBody = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e5e7eb; rounded: 12px;">
         <h2 style="color: #0f766e;">Resumen Diario de Atención — Atendia</h2>
-        <p>Aquí tienes el balance de actividad de hoy en <b>Clínica Dental San Salvador</b>:</p>
+        <p>Aquí tienes el balance de actividad de hoy en <b>Atendia Demo Studio</b>:</p>
         <table style="width: 100%; border-collapse: collapse; margin-top: 16px;">
           <tr>
             <td style="padding: 10px; border-bottom: 1px solid #eee;"><b>Conversaciones atendidas hoy:</b></td>

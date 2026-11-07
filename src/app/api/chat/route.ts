@@ -109,7 +109,7 @@ export async function POST(req: Request) {
       normalizedText.includes('asistencia humana');
 
     if (isExplicitHumanRequest) {
-      const handoffMsg = 'Entendido. He transferido tu conversación a nuestro equipo de atención humana. Un asesor de la clínica te responderá en unos instantes.';
+      const handoffMsg = 'Entendido. He transferido tu conversación a nuestro equipo de atención humana. Un asesor de daniautoma te responderá en unos instantes.';
       await executeToolCall('pasar_a_humano', {
         motivo: 'Solicitud expresa del cliente: ' + message,
         urgencia: 'alta',
@@ -152,12 +152,12 @@ export async function POST(req: Request) {
     ]);
 
     const systemPrompt = buildSystemPrompt({
-      assistantName: assistant?.name || 'DentalIA',
-      businessName: business?.name || 'Clínica Dental San Salvador',
-      activity: business?.activity || 'Odontología integral y diseño de sonrisa',
-      address: business?.address || 'Paseo General Escalón #3700, San Salvador',
+      assistantName: assistant?.name || 'Valentina (Asistente Virtual Demo)',
+      businessName: business?.name || 'Atendia Demo Studio',
+      activity: business?.activity || 'Demostración de Asistente de IA Omnicanal y Agendamiento Automatizado',
+      address: business?.address || 'Entorno de Prueba en Vivo de daniautoma',
       phone: business?.phone || '+503 2200 1234',
-      website: business?.website || 'https://dentalsansalvador.sv',
+      website: business?.website || 'https://demo.daniautoma.cloud',
       timezone: business?.timezone || 'America/El_Salvador',
       tone: assistant?.tone || 'cercano',
       welcomeMessage: assistant?.welcomeMessage || '',

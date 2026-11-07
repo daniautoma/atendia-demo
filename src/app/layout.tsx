@@ -2,8 +2,8 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Atendia — Asistente de IA Omnicanal',
-  description: 'Panel de control y atención automatizada por WhatsApp y Web para negocios locales',
+  title: 'Atendia | Sistema de Asistentes IA & Agendamiento (Modo Demo)',
+  description: 'Atendia Demo Studio — Entorno de Prueba en Vivo de daniautoma',
 };
 
 export default function RootLayout({

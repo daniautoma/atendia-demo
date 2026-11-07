@@ -47,9 +47,9 @@ export default function CanalesPage() {
 
   // Estados del Chat Web
   const [webEnabled, setWebEnabled] = useState(true);
-  const [webColor, setWebColor] = useState('#0d9488');
-  const [webTitle, setWebTitle] = useState('Atención Clínica Dental San Salvador');
-  const [webWelcome, setWebWelcome] = useState('¡Hola! ¿Tienes alguna pregunta o deseas pedir cita?');
+  const [webColor, setWebColor] = useState('#2563eb');
+  const [webTitle, setWebTitle] = useState('Valentina | Asistente Virtual Demo');
+  const [webWelcome, setWebWelcome] = useState('¡Hola! Soy Valentina de daniautoma. ¿Te gustaría agendar una cita o conocer nuestras automatizaciones?');
   const [appUrl, setAppUrl] = useState('http://localhost:3000');
   const [copiedScript, setCopiedScript] = useState(false);
   const [copiedWebhookUrl, setCopiedWebhookUrl] = useState(false);
@@ -74,8 +74,8 @@ export default function CanalesPage() {
       }
       if (data.web) {
         setWebEnabled(data.web.enabled ?? true);
-        setWebColor(data.web.color || '#0d9488');
-        setWebTitle(data.web.title || 'Atención Clínica Dental San Salvador');
+        setWebColor(data.web.color || '#2563eb');
+        setWebTitle(data.web.title || 'Valentina | Asistente Virtual Demo');
         setWebWelcome(data.web.welcome || '');
       }
       if (data.appUrl) setAppUrl(data.appUrl);

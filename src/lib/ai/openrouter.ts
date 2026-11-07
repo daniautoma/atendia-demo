@@ -242,7 +242,7 @@ export async function callOpenRouter(options: ChatCompletionOptions): Promise<Co
     wasFallback: true,
     message: {
       role: 'assistant',
-      content: '¡Hola! Gracias por comunicarte con Clínica Dental San Salvador. En este momento estoy experimentando una breve intermitencia técnica y he transferido tu consulta a nuestro equipo. Un asesor te responderá a la brevedad. Para urgencias directas puedes llamarnos al +503 2200 1234.',
+      content: '¡Hola! Gracias por comunicarte con Atendia Demo Studio. En este momento estoy experimentando una breve intermitencia técnica y he transferido tu consulta a nuestro equipo de daniautoma. Un asesor te responderá a la brevedad.',
     },
   };
 }

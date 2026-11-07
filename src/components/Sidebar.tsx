@@ -32,9 +32,9 @@ interface SidebarProps {
 }
 
 export function Sidebar({
-  businessName = 'Clínica Dental San Salvador',
+  businessName = 'Atendia Demo Studio',
   assistantActive = true,
-  agencyName = 'Agencia Atendia',
+  agencyName = 'daniautoma',
   userRole = 'AGENT',
   userName = 'Usuario',
 }: SidebarProps) {
@@ -78,17 +78,23 @@ export function Sidebar({
       {/* Cabecera de la Marca */}
       <div className="p-5 border-b border-stone-800">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-teal-500 flex items-center justify-center text-white font-bold text-lg shadow-md shadow-teal-500/20">
+          <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-lg shadow-md shadow-blue-500/20">
             A
           </div>
           <div>
-            <h1 className="font-semibold text-white text-base tracking-tight leading-none">Atendia</h1>
-            <p className="text-[11px] text-stone-400 mt-0.5">{agencyName}</p>
+            <h1 className="font-semibold text-white text-base tracking-tight leading-none">Atendia Demo Studio</h1>
+            <p className="text-[11px] text-blue-300 font-medium mt-0.5">{agencyName || 'daniautoma'}</p>
           </div>
         </div>
 
+        {/* Badge Entorno de Prueba en Vivo */}
+        <div className="mt-3 px-2.5 py-1 rounded-md bg-blue-950/60 border border-blue-800/50 flex items-center gap-1.5 text-[11px] text-blue-300 font-medium">
+          <Sparkles className="w-3 h-3 text-blue-400 shrink-0" />
+          <span className="truncate">Entorno de Prueba en Vivo de daniautoma</span>
+        </div>
+
         {/* Tarjeta del Negocio Actual */}
-        <div className="mt-4 p-2.5 rounded-lg bg-stone-800/80 border border-stone-700/60 flex items-center justify-between">
+        <div className="mt-3 p-2.5 rounded-lg bg-stone-800/80 border border-stone-700/60 flex items-center justify-between">
           <div className="flex items-center gap-2 truncate">
             <Building2 className="w-4 h-4 text-stone-400 shrink-0" />
             <div className="truncate">
@@ -100,7 +106,7 @@ export function Sidebar({
                   }`}
                 />
                 <span className="text-[10px] text-stone-400">
-                  {assistantActive ? 'Asistente activo' : 'En pausa'}
+                  {assistantActive ? 'Valentina activa' : 'En pausa'}
                 </span>
               </div>
             </div>

@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Sparkles, Building2, Phone, Calendar } from 'lucide-react';
+import { ArrowLeft, Sparkles, Building2, Phone, Calendar, Bot, Cpu } from 'lucide-react';
 import { prisma } from '@/lib/prisma';
 import { WebChatWidget } from '@/components/channels/WebChatWidget';
 
@@ -20,9 +20,9 @@ export default async function DemoPage() {
           data: {
             type: 'WEB',
             webChatEnabled: true,
-            webChatColor: '#0d9488',
-            webChatTitle: 'Atención Clínica Dental San Salvador',
-            webChatWelcome: '¡Hola! ¿Tienes alguna pregunta sobre nuestros tratamientos o deseas pedir cita?',
+            webChatColor: '#2563eb',
+            webChatTitle: 'Valentina | Asistente Virtual Demo',
+            webChatWelcome: '¡Hola! Soy Valentina, asistente virtual de demostración desarrollado por daniautoma. ¿Te gustaría agendar una cita o conocer nuestras automatizaciones?',
           },
         });
       } catch {}
@@ -30,16 +30,23 @@ export default async function DemoPage() {
   } catch {}
 
   return (
-    <div className="min-h-screen bg-stone-100 flex flex-col relative">
-      {/* Barra de cabecera de la clínica demo */}
+    <div className="min-h-screen bg-stone-100 flex flex-col relative font-sans">
+      {/* Barra superior de aviso de prueba en vivo */}
+      <div className="bg-gradient-to-r from-blue-700 via-indigo-700 to-slate-900 text-white text-xs font-medium py-1 px-4 text-center flex items-center justify-center gap-2 shadow-xs shrink-0 select-none">
+        <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+        <span className="font-semibold tracking-wide">Entorno de Prueba en Vivo de daniautoma</span>
+        <span className="hidden sm:inline text-blue-200">| Atendia Demo Studio</span>
+      </div>
+
+      {/* Barra de cabecera */}
       <nav className="bg-white border-b border-stone-200 px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-teal-600 text-white flex items-center justify-center font-bold text-base shadow-xs">
-            S
+          <div className="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-base shadow-xs">
+            D
           </div>
           <div>
-            <h1 className="font-bold text-stone-900 text-sm">{business?.name || 'Clínica Dental San Salvador'}</h1>
-            <p className="text-[11px] text-stone-500">{business?.activity || 'Odontología integral en San Salvador'}</p>
+            <h1 className="font-bold text-stone-900 text-sm">{business?.name || 'Atendia Demo Studio'}</h1>
+            <p className="text-[11px] text-stone-500">{business?.activity || 'Demostración de Asistente de IA Omnicanal y Agendamiento'}</p>
           </div>
         </div>
 
@@ -52,48 +59,53 @@ export default async function DemoPage() {
         </Link>
       </nav>
 
-      {/* Hero de demostración del sitio web del cliente */}
+      {/* Hero de demostración */}
       <main className="flex-1 max-w-4xl w-full mx-auto p-8 flex flex-col justify-center items-center text-center">
-        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-teal-50 border border-teal-200 text-teal-800 text-xs font-semibold mb-4">
-          <Sparkles className="w-3.5 h-3.5" />
-          Página web simulada del negocio local
+        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-800 text-xs font-semibold mb-4">
+          <Sparkles className="w-3.5 h-3.5 text-blue-600" />
+          Sitio Web Demo para Clientes Potenciales (Negocios, Clínicas y Servicios)
         </span>
 
         <h2 className="text-3xl sm:text-4xl font-extrabold text-stone-900 tracking-tight max-w-2xl">
-          Tu sonrisa en las mejores manos en San Salvador
+          Atención al Cliente 24/7 y Agendamiento Inteligente con IA
         </h2>
 
         <p className="mt-4 text-stone-600 text-sm max-w-xl leading-relaxed">
-          Esta es la página pública donde se integra el widget de chat de Atendia. Los pacientes pueden consultar dudas clínicas, horarios y reservar citas en tiempo real.
+          Esta es la página pública donde se integra el widget de <b>Valentina</b>. Los clientes pueden resolver dudas al instante, conocer los servicios y agendar citas en un calendario interactivo en tiempo real.
         </p>
 
         <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4 w-full max-w-2xl text-left">
-          <div className="p-4 rounded-xl bg-white border border-stone-200 shadow-2xs">
-            <Calendar className="w-5 h-5 text-teal-600 mb-2" />
-            <h3 className="font-bold text-xs text-stone-900">Cita Online</h3>
-            <p className="text-[11px] text-stone-500 mt-1">Primera visita y diagnóstico digital 3D gratuito.</p>
+          <div className="p-4 rounded-xl bg-white border border-stone-200 shadow-2xs hover:border-blue-300 transition-colors">
+            <Calendar className="w-5 h-5 text-blue-600 mb-2" />
+            <h3 className="font-bold text-xs text-stone-900">Consulta Inicial (30 min)</h3>
+            <p className="text-[11px] text-stone-500 mt-1">Evaluación diagnóstica y asesoría general sin costo para tu negocio.</p>
           </div>
 
-          <div className="p-4 rounded-xl bg-white border border-stone-200 shadow-2xs">
-            <Phone className="w-5 h-5 text-teal-600 mb-2" />
-            <h3 className="font-bold text-xs text-stone-900">Atención Directa</h3>
-            <p className="text-[11px] text-stone-500 mt-1">{business?.phone || '+503 2200 1234'}</p>
+          <div className="p-4 rounded-xl bg-white border border-stone-200 shadow-2xs hover:border-blue-300 transition-colors">
+            <Bot className="w-5 h-5 text-blue-600 mb-2" />
+            <h3 className="font-bold text-xs text-stone-900">Cita Especializada (45 min)</h3>
+            <p className="text-[11px] text-stone-500 mt-1">Atención personalizada para definir alcance y soluciones específicas.</p>
           </div>
 
-          <div className="p-4 rounded-xl bg-white border border-stone-200 shadow-2xs">
-            <Building2 className="w-5 h-5 text-teal-600 mb-2" />
-            <h3 className="font-bold text-xs text-stone-900">Ubicación</h3>
-            <p className="text-[11px] text-stone-500 mt-1">{business?.address || 'Paseo General Escalón #3700, San Salvador'}</p>
+          <div className="p-4 rounded-xl bg-white border border-stone-200 shadow-2xs hover:border-blue-300 transition-colors">
+            <Cpu className="w-5 h-5 text-blue-600 mb-2" />
+            <h3 className="font-bold text-xs text-stone-900">Muestrario con n8n</h3>
+            <p className="text-[11px] text-stone-500 mt-1">Demostración en vivo de automatización omnicanal, webhooks y Google Calendar.</p>
           </div>
+        </div>
+
+        <div className="mt-8 p-3 rounded-xl bg-blue-50/80 border border-blue-200/80 text-blue-900 text-xs flex items-center gap-2 max-w-lg">
+          <Sparkles className="w-4 h-4 text-blue-600 shrink-0" />
+          <span>Haz clic en el botón flotante en la esquina inferior derecha para conversar con <b>Valentina</b>.</span>
         </div>
       </main>
 
       {/* Widget Interactivo Real del Chat Web */}
       {(channelWeb ? channelWeb.webChatEnabled : true) && (
         <WebChatWidget
-          color={channelWeb?.webChatColor || '#0d9488'}
-          title={channelWeb?.webChatTitle || 'Atención Clínica Dental San Salvador'}
-          welcomeMessage={channelWeb?.webChatWelcome || '¡Hola! ¿Tienes alguna pregunta sobre nuestros tratamientos o deseas pedir cita?'}
+          color={channelWeb?.webChatColor || '#2563eb'}
+          title={channelWeb?.webChatTitle || 'Valentina | Asistente Virtual Demo'}
+          welcomeMessage={channelWeb?.webChatWelcome || '¡Hola! Soy Valentina, asistente virtual de demostración desarrollado por daniautoma. ¿Te gustaría agendar una cita o conocer nuestras automatizaciones?'}
         />
       )}
     </div>

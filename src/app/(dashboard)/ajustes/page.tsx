@@ -27,7 +27,7 @@ export default function AjustesPage() {
 
   // Datos
   const [timezone, setTimezone] = useState('America/El_Salvador');
-  const [agencyName, setAgencyName] = useState('Agencia Atendia');
+  const [agencyName, setAgencyName] = useState('daniautoma');
   const [agencyLogo, setAgencyLogo] = useState('');
   const [selectedModel, setSelectedModel] = useState('openai/gpt-4o-mini');
   const [fallbackModel, setFallbackModel] = useState('openai/gpt-4o-mini');
@@ -60,7 +60,7 @@ export default function AjustesPage() {
       .then((data) => {
         if (data.business) {
           setTimezone(data.business.timezone || 'America/El_Salvador');
-          setAgencyName(data.business.agencyName || 'Agencia Atendia');
+          setAgencyName(data.business.agencyName || 'daniautoma');
           setAgencyLogo(data.business.agencyLogo || '');
         }
         if (data.assistant) {
@@ -595,7 +595,7 @@ export default function AjustesPage() {
                 value={agencyName}
                 onChange={(e) => setAgencyName(e.target.value)}
                 className="w-full px-3 py-2 rounded-lg border border-stone-300 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-teal-500"
-                placeholder="ej: Agencia Atendia"
+                placeholder="ej: daniautoma"
               />
             </div>
           </div>
