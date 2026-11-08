@@ -29,7 +29,7 @@ services:
       APP_URL: ${APP_URL}
       ENCRYPTION_KEY: ${ENCRYPTION_KEY}
       AUTH_SECRET: ${AUTH_SECRET}
-      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@atendia.local}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@demo.daniautoma.cloud}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin1234password}
       OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
