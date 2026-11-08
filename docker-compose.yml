@@ -2,7 +2,6 @@ services:
   # 1. Base de datos PostgreSQL
   postgres:
     image: postgres:16-alpine
-    container_name: atendia-postgres
     restart: always
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
@@ -20,7 +19,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: atendia-web
     restart: always
     command: sh -c "npx prisma db push && npm run prisma:seed && npm run start"
     environment:
@@ -46,7 +44,6 @@ services:
   # 3. Worker de fondo (WhatsApp Baileys, Debounce 8s, Tareas programadas)
   worker:
     image: atendia-app:latest
-    container_name: atendia-worker
     user: root
     restart: always
     command: npm run start:worker
