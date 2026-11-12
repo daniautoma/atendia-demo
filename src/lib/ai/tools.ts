@@ -367,6 +367,13 @@ export async function executeToolCall(
         const [appYear, appMonth, appDay] = cleanDatePart.split('-').map(Number);
         const appDateObj = new Date(appYear, appMonth - 1, appDay, 12, 0, 0);
         const appDayOfWeek = appDateObj.getDay(); // 0 = Domingo, 1 = Lunes, ..., 6 = Sábado
+        const diasSemana = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+        const meses = [
+          'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
+          'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'
+        ];
+        const nombreDiaCita = diasSemana[appDayOfWeek];
+        const nombreMesCita = meses[appMonth - 1];
 
         let appHours = 10;
         let appMinutes = 0;
@@ -377,6 +384,12 @@ export async function executeToolCall(
           if (!isNaN(m)) appMinutes = m;
         }
         const appTotalMinutes = appHours * 60 + appMinutes;
+
+        const ampm = appHours >= 12 ? 'p.m.' : 'a.m.';
+        const h12 = appHours % 12 || 12;
+        const mStr = appMinutes.toString().padStart(2, '0');
+        const horaLegible = `${h12}:${mStr} ${ampm}`;
+        const fechaLegible = `${nombreDiaCita} ${appDay} de ${nombreMesCita} de ${appYear} a las ${horaLegible}`;
 
         // A. RESTRICCIÓN DOMINGO (CERRADO)
         if (appDayOfWeek === 0) {
@@ -620,11 +633,15 @@ export async function executeToolCall(
             citaId: createdAppointment?.id || 'cita_' + Date.now(),
             status: 'CONFIRMED',
             paciente: args.nombre_cliente,
+            telefono: validPhone,
             servicio: args.servicio,
             fechaHora: args.fecha_hora,
+            diaSemanaConfirmado: nombreDiaCita,
+            fechaLegibleConfirmada: fechaLegible,
             googleCalendarEventId: gcalEventId,
+            INSTRUCCION_OBLIGATORIA_RESPUESTA: `Cita agendada con éxito para el día ${nombreDiaCita.toUpperCase()} (${fechaLegible}). Es estrictamente obligatorio que en tu confirmación al paciente uses exactamente la frase "${fechaLegible}". NUNCA digas un día de la semana diferente (si es lunes, di lunes; no digas martes).`,
           },
-          summary: `Cita confirmada y registrada en agenda para ${args.nombre_cliente} (${args.servicio})${gcalEventId ? ' (Sincronizada con Google Calendar)' : ''}.`,
+          summary: `Cita confirmada para ${args.nombre_cliente} (${args.servicio}) el ${fechaLegible}${gcalEventId ? ' (Sincronizada con Google Calendar)' : ''}.`,
         };
       }
 
