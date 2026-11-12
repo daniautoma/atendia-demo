@@ -48,13 +48,45 @@ export function buildSystemPrompt(ctx: PromptContext): string {
   });
   const formattedDateTime = dateFormatter.format(now);
 
+  // Generar tabla de referencia de los próximos 14 días para anclaje temporal estricto
+  const calendarLines: string[] = [];
+  for (let offset = 0; offset < 14; offset++) {
+    const target = new Date(now.getTime() + offset * 86400000);
+    const dayFormatter = new Intl.DateTimeFormat('es-SV', {
+      timeZone: ctx.timezone || 'America/El_Salvador',
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    });
+    const isoDate = new Intl.DateTimeFormat('en-CA', {
+      timeZone: ctx.timezone || 'America/El_Salvador',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    }).format(target);
+
+    const formattedDay = dayFormatter.format(target);
+    const dayOfWeek = new Date(`${isoDate}T12:00:00Z`).getUTCDay();
+
+    let estado = 'Abierto habitual (08:00 a 18:00) • NO es festivo';
+    if (dayOfWeek === 0) {
+      estado = 'CERRADO (Domingo - NUNCA agendar en domingo)';
+    } else if (dayOfWeek === 6) {
+      estado = 'Abierto horario matutino (08:00 a 13:00)';
+    }
+
+    calendarLines.push(`- **${formattedDay}** [Código ISO: \`${isoDate}\`]: ${estado}${offset === 0 ? ' « HOY' : ''}`);
+  }
+  const calendarReferenceTable = calendarLines.join('\n');
+
   // Si existe un prompt personalizado definido por el usuario, se utiliza con la fecha/hora actual inyectada
   if (ctx.systemPromptOverride && ctx.systemPromptOverride.trim().length > 0) {
     let custom = ctx.systemPromptOverride;
     if (custom.includes('{fecha}') || custom.includes('{date}')) {
       custom = custom.replace(/\{fecha\}|\{date\}/gi, formattedDateTime);
     } else {
-      custom = `${custom}\n\n# FECHA Y HORA ACTUAL (ZONA HORARIA ${ctx.timezone || 'America/El_Salvador'})\nHoy es: ${formattedDateTime}.`;
+      custom = `${custom}\n\n# FECHA Y HORA ACTUAL (ZONA HORARIA ${ctx.timezone || 'America/El_Salvador'})\nHoy es: ${formattedDateTime}.\n\n# CALENDARIO DE REFERENCIA OFICIAL (PRÓXIMOS 14 DÍAS)\n${calendarReferenceTable}`;
     }
     return custom;
   }
@@ -97,6 +129,10 @@ Sitio web: ${ctx.website}.
 Hoy es: ${formattedDateTime}.
 Ten en cuenta siempre la fecha y hora actual para responder con coherencia sobre citas, disponibilidad y horarios.
 
+# CALENDARIO DE REFERENCIA OFICIAL (PRÓXIMOS 14 DÍAS)
+Utiliza obligatoriamente esta tabla para verificar qué día de la semana corresponde a cada fecha y su código ISO:
+${calendarReferenceTable}
+
 # ESTILO Y TONO DE COMUNICACIÓN
 ${selectedTone}
 - Respuestas breves, naturales y adaptadas al formato de mensajería instantánea (máximo 2 a 3 párrafos cortos).
@@ -118,6 +154,8 @@ ${selectedTone}
 4. Antes de agendar o modificar cualquier cita, confirma explícitamente con el cliente el servicio, día y hora.
 5. NUNCA ofrezcas ni agendes citas los domingos, incluso si el usuario insiste o el sistema parece mostrar disponibilidad. La clínica permanece totalmente cerrada los domingos.
 6. Si el cliente envía imágenes o notas de voz (o se indica en el sistema), solicita amablemente que te detalle su consulta por escrito para poder atenderle de inmediato.
+7. PROHIBIDO INVENTAR DÍAS FESTIVOS O CIERRES: NUNCA digas que un día es festivo ni que la clínica está cerrada si en el «CALENDARIO DE REFERENCIA OFICIAL» figura como abierto. El único día regular de cierre es el DOMINGO. Si el paciente pide cualquier día hábil (lunes a sábado), estás OBLIGADO a invocar la herramienta 'consultar_disponibilidad'.
+8. EXACTITUD DE DÍAS Y CÓDIGOS ISO: Consulta siempre el «CALENDARIO DE REFERENCIA OFICIAL» para saber exactamente qué día de la semana cae cada fecha (ej. si el usuario dice "viernes 13", comprueba que el 13 es viernes). Usa siempre el código ISO \`YYYY-MM-DD\` indicado en la tabla para llamar a las herramientas. Nunca confundas los días (ej. no llames "martes" a un lunes).
 
 # INSTRUCCIONES ESPECÍFICAS DEL NEGOCIO
 ${ctx.customInstructions || 'Atiende cordialmente y facilita la reserva de citas y resolución de dudas.'}
@@ -161,4 +199,3 @@ ${faqsText}
 ${notesText ? `# INFORMACIÓN ADICIONAL DE LA CLÍNICA\n${notesText}` : ''}
 `;
 }
-

@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Header } from '@/components/Header';
 import { Modal } from '@/components/ui/Modal';
+import { ModelCombobox } from '@/components/settings/ModelCombobox';
 import {
   Settings,
   Cpu,
@@ -17,6 +18,7 @@ import {
   Key,
   Globe,
   Sparkles,
+  RefreshCw,
 } from 'lucide-react';
 
 export default function AjustesPage() {
@@ -39,9 +41,7 @@ export default function AjustesPage() {
   const [testingOpenRouter, setTestingOpenRouter] = useState(false);
   const [testResult, setTestResult] = useState<{ success: boolean; message: string } | null>(null);
   const [keySource, setKeySource] = useState<'DATABASE' | 'ENV' | 'NONE'>('NONE');
-  const [fetchingFreeModels, setFetchingFreeModels] = useState(false);
-  const [freeModelsLoaded, setFreeModelsLoaded] = useState(false);
-  const [customModelInput, setCustomModelInput] = useState('');
+  const [fetchingModels, setFetchingModels] = useState(false);
 
   // Estimador de costes
   const [conversationsPerMonth, setConversationsPerMonth] = useState(600);
@@ -53,6 +53,25 @@ export default function AjustesPage() {
   const [newUserEmail, setNewUserEmail] = useState('');
   const [newUserPassword, setNewUserPassword] = useState('');
   const [newUserRole, setNewUserRole] = useState('AGENT');
+
+  const fetchDynamicModels = async () => {
+    setFetchingModels(true);
+    try {
+      const res = await fetch('/api/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'FETCH_OPENROUTER_MODELS' }),
+      });
+      const data = await res.json();
+      if (data.ok && Array.isArray(data.models)) {
+        setModels(data.models);
+      }
+    } catch {
+      // mantener los modelos precargados
+    } finally {
+      setFetchingModels(false);
+    }
+  };
 
   useEffect(() => {
     fetch('/api/settings')
@@ -72,6 +91,10 @@ export default function AjustesPage() {
         setHasOpenRouterKey(!!data.hasOpenRouterKey);
         if (data.maskedOpenRouterKey) setMaskedOpenRouterKey(data.maskedOpenRouterKey);
         if (data.keySource) setKeySource(data.keySource);
+
+        if (data.hasOpenRouterKey) {
+          fetchDynamicModels();
+        }
       })
       .catch(() => setError('Error al cargar la configuración.'))
       .finally(() => setLoading(false));
@@ -113,11 +136,13 @@ export default function AjustesPage() {
             success: true,
             message: '✓ Clave verificada con OpenRouter y GUARDADA en la base de datos de Atendia.',
           });
+          fetchDynamicModels();
         } else {
           setTestResult({
             success: true,
             message: '✓ Conexión con OpenRouter verificada exitosamente.',
           });
+          fetchDynamicModels();
         }
       } else {
         setTestResult({
@@ -132,30 +157,6 @@ export default function AjustesPage() {
       });
     } finally {
       setTestingOpenRouter(false);
-    }
-  };
-
-  const handleFetchFreeModels = async () => {
-    setFetchingFreeModels(true);
-    try {
-      const res = await fetch('/api/settings', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'FETCH_OPENROUTER_MODELS' }),
-      });
-      const data = await res.json();
-      if (data.ok && Array.isArray(data.models)) {
-        const existingIds = new Set(models.map((m) => m.id));
-        const newModels = data.models.filter((m: any) => !existingIds.has(m.id));
-        setModels((prev) => [...prev, ...newModels]);
-        setFreeModelsLoaded(true);
-      } else {
-        alert(data.error || 'No se pudieron consultar modelos gratuitos.');
-      }
-    } catch (err: any) {
-      alert(err?.message || 'Error de red al consultar modelos.');
-    } finally {
-      setFetchingFreeModels(false);
     }
   };
 
@@ -286,7 +287,7 @@ export default function AjustesPage() {
           </div>
         )}
 
-        {/* 1. Selección del Modelo de IA y Estimador de Costes */}
+        {/* 1. Configuración de Inteligencia Artificial (OpenRouter) */}
         <section className="bg-white rounded-xl border border-stone-200 shadow-xs p-6 space-y-6">
           <div className="flex items-center justify-between pb-4 border-b border-stone-100">
             <div className="flex items-center gap-2.5">
@@ -294,9 +295,9 @@ export default function AjustesPage() {
                 <Cpu className="w-4 h-4" />
               </div>
               <div>
-                <h3 className="text-sm font-bold text-stone-900">Modelo de Inteligencia Artificial</h3>
+                <h3 className="text-sm font-bold text-stone-900">Configuración de Modelos e Inteligencia Artificial</h3>
                 <p className="text-xs text-stone-500">
-                  Modelos de OpenRouter con soporte para llamada a herramientas (Function Calling)
+                  Gestión centralizada de OpenRouter, catálogo dinámico y estimación de consumo
                 </p>
               </div>
             </div>
@@ -312,132 +313,11 @@ export default function AjustesPage() {
             </span>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-semibold text-stone-700 mb-1.5">
-                Modelo Principal de IA
-              </label>
-              <select
-                value={selectedModel}
-                onChange={(e) => setSelectedModel(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-lg border border-stone-300 text-sm text-stone-900 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500"
-              >
-                {!models.some((m) => m.id === selectedModel) && (
-                  <option value={selectedModel}>
-                    {selectedModel} (Personalizado)
-                  </option>
-                )}
-                {models.map((m) => (
-                  <option key={m.id} value={m.id}>
-                    {m.name} ({m.provider}) {m.recommended ? '★ Recomendado' : ''}
-                  </option>
-                ))}
-              </select>
-              {activeModelObj && (
-                <p className="text-xs text-stone-500 mt-1.5 leading-relaxed">
-                  {activeModelObj.description}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-stone-700 mb-1.5">
-                Modelo de Respaldo (Fallback)
-              </label>
-              <select
-                value={fallbackModel}
-                onChange={(e) => setFallbackModel(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-lg border border-stone-300 text-sm text-stone-900 bg-white focus:outline-none focus:ring-2 focus:ring-teal-500"
-              >
-                {!models.some((m) => m.id === fallbackModel) && (
-                  <option value={fallbackModel}>
-                    {fallbackModel} (Personalizado)
-                  </option>
-                )}
-                {models.map((m) => (
-                  <option key={m.id} value={m.id}>
-                    {m.name} ({m.provider})
-                  </option>
-                ))}
-              </select>
-              <p className="text-[11px] text-stone-400 mt-1.5">
-                Si el modelo principal falla o no responde, se registrará en Actividad y se reintentará una vez con este modelo.
-              </p>
-            </div>
-          </div>
-
-          {/* Selector de modelos gratuitos y personalizados */}
-          <div className="p-4 rounded-xl bg-stone-50 border border-stone-200 space-y-3">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <span className="text-xs font-bold text-stone-800 uppercase tracking-wider">
-                Modelos Gratuitos y Personalizados de OpenRouter
-              </span>
-              <button
-                type="button"
-                onClick={handleFetchFreeModels}
-                disabled={fetchingFreeModels}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-teal-200 bg-teal-50 hover:bg-teal-100 text-teal-800 text-xs font-semibold transition-colors cursor-pointer disabled:opacity-50"
-              >
-                <Sparkles className="w-3.5 h-3.5 text-teal-600" />
-                <span>
-                  {fetchingFreeModels
-                    ? 'Consultando OpenRouter...'
-                    : freeModelsLoaded
-                    ? '✓ Modelos gratuitos agregados a la lista'
-                    : 'Buscar modelos gratuitos (:free) en OpenRouter'}
-                </span>
-              </button>
-            </div>
-
-            <div>
-              <label className="block text-[11px] font-semibold text-stone-600 mb-1">
-                O escribir ID exacto de cualquier modelo de OpenRouter (ej: google/gemma-4-26b-a4b-it:free)
-              </label>
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  value={customModelInput}
-                  onChange={(e) => setCustomModelInput(e.target.value)}
-                  placeholder="ej: google/gemma-4-26b-a4b-it:free"
-                  className="flex-1 px-3 py-1.5 rounded-lg border border-stone-300 text-xs font-mono text-stone-900 bg-white placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-teal-500"
-                />
-                <button
-                  type="button"
-                  onClick={() => {
-                    const clean = customModelInput.trim();
-                    if (clean) {
-                      setSelectedModel(clean);
-                      if (!models.some((m) => m.id === clean)) {
-                        setModels((prev) => [
-                          ...prev,
-                          {
-                            id: clean,
-                            name: `${clean} (Personalizado)`,
-                            provider: clean.split('/')[0] || 'OpenRouter',
-                            inputCostPer1M: 0,
-                            outputCostPer1M: 0,
-                            contextLength: 32768,
-                            recommended: false,
-                            description: 'Modelo definido manualmente.',
-                          },
-                        ]);
-                      }
-                      setCustomModelInput('');
-                    }
-                  }}
-                  disabled={!customModelInput.trim()}
-                  className="px-3.5 py-1.5 rounded-lg bg-stone-800 hover:bg-stone-900 text-white text-xs font-semibold shadow-xs disabled:opacity-40 cursor-pointer shrink-0"
-                >
-                  Asignar como Principal
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Configuración de API Key de OpenRouter */}
+          {/* BLOQUE 1: Configuración de API Key de OpenRouter */}
           <div className="p-4 rounded-xl bg-stone-50 border border-stone-200 space-y-3">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div className="flex items-center gap-2">
+                <span className="w-5 h-5 rounded-full bg-teal-600 text-white flex items-center justify-center font-bold text-[10px]">1</span>
                 <Key className="w-4 h-4 text-teal-600" />
                 <label className="text-xs font-bold text-stone-900 uppercase tracking-wider">
                   Clave de API de OpenRouter (OPENROUTER_API_KEY)
@@ -505,16 +385,62 @@ export default function AjustesPage() {
             )}
 
             <p className="text-[11px] text-stone-500 leading-relaxed">
-              <strong>Decisión de prioridad:</strong> La clave guardada en este formulario de Atendia tiene <strong>prioridad absoluta</strong> sobre cualquier variable de entorno o archivo <code className="text-stone-700 font-mono">.env</code>. Al pulsar en &quot;Probar y Guardar en Atendia&quot;, se valida en vivo contra OpenRouter y se almacena cifrada en la base de datos de PostgreSQL con efecto inmediato para todo el sistema.
+              <strong>Decisión de prioridad:</strong> La clave guardada en este formulario de Atendia tiene <strong>prioridad absoluta</strong> sobre cualquier variable de entorno o archivo <code className="text-stone-700 font-mono">.env</code>. Al guardar una clave válida, se actualiza en vivo el catálogo oficial de OpenRouter para los selectores.
             </p>
           </div>
 
-          {/* Estimación interactiva de costes */}
-          <div className="mt-4 p-4 rounded-xl bg-stone-50 border border-stone-200 space-y-4">
+          {/* BLOQUE 2: Selección Unificada de Modelos (Searchable Combobox) */}
+          <div className="space-y-3 pt-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="w-5 h-5 rounded-full bg-teal-600 text-white flex items-center justify-center font-bold text-[10px]">2</span>
+                <h4 className="text-xs font-bold text-stone-900 uppercase tracking-wider">
+                  Selección de Modelos de IA
+                </h4>
+              </div>
+              {hasOpenRouterKey && (
+                <button
+                  type="button"
+                  onClick={fetchDynamicModels}
+                  disabled={fetchingModels}
+                  className="flex items-center gap-1.5 text-xs text-teal-700 hover:text-teal-800 font-medium cursor-pointer disabled:opacity-50"
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 ${fetchingModels ? 'animate-spin' : ''}`} />
+                  <span>{fetchingModels ? 'Actualizando catálogo...' : 'Actualizar catálogo de OpenRouter'}</span>
+                </button>
+              )}
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <ModelCombobox
+                label="Modelo Principal de IA"
+                value={selectedModel}
+                onChange={setSelectedModel}
+                models={models}
+                disabled={!hasOpenRouterKey}
+                disabledNotice="Introduce y valida tu OPENROUTER_API_KEY en el paso 1 para desbloquear la selección de modelos."
+                helperText={activeModelObj?.description || 'Modelo activo que procesará todos los mensajes y la lógica del asistente.'}
+              />
+
+              <ModelCombobox
+                label="Modelo de Respaldo (Fallback)"
+                value={fallbackModel}
+                onChange={setFallbackModel}
+                models={models}
+                disabled={!hasOpenRouterKey}
+                disabledNotice="Introduce y valida tu OPENROUTER_API_KEY en el paso 1 para desbloquear la selección de modelos."
+                helperText="Si el modelo principal falla o no responde por sobrecarga del proveedor, se reintentará una vez con este modelo."
+              />
+            </div>
+          </div>
+
+          {/* BLOQUE 3: Estimación Interactiva de Costes */}
+          <div className="p-4 rounded-xl bg-stone-50 border border-stone-200 space-y-4">
             <div className="flex items-center gap-2">
+              <span className="w-5 h-5 rounded-full bg-teal-600 text-white flex items-center justify-center font-bold text-[10px]">3</span>
               <Coins className="w-4 h-4 text-teal-600" />
               <h4 className="text-xs font-bold text-stone-900 uppercase tracking-wider">
-                Estimación Interactiva de Costes OpenRouter
+                Estimación Interactiva de Costes ({activeModelObj?.name || selectedModel})
               </h4>
             </div>
 
@@ -552,10 +478,10 @@ export default function AjustesPage() {
               <div className="flex flex-col justify-center items-start sm:items-end">
                 <span className="text-[11px] text-stone-500">Coste estimado de IA al mes:</span>
                 <span className="text-lg font-bold text-teal-700">
-                  {monthlyCostEstimate < 0.01 ? '< $0.01' : `~$${monthlyCostEstimate.toFixed(2)} USD/mes`}
+                  {monthlyCostEstimate === 0 ? '$0.00 USD/mes (Gratis)' : monthlyCostEstimate < 0.01 ? '< $0.01 USD/mes' : `~$${monthlyCostEstimate.toFixed(2)} USD/mes`}
                 </span>
                 <span className="text-[10px] text-stone-400">
-                  {totalMessagesMonth.toLocaleString()} mensajes / mes
+                  {totalMessagesMonth.toLocaleString()} mensajes / mes • Tarifa: ${activeModelObj?.inputCostPer1M || 0}/1M
                 </span>
               </div>
             </div>
@@ -724,4 +650,3 @@ export default function AjustesPage() {
     </div>
   );
 }
-

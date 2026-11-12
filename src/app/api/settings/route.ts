@@ -15,6 +15,7 @@ export const POPULAR_TOOL_MODELS = [
     outputCostPer1M: 0.6,
     contextLength: 128000,
     recommended: true,
+    isFree: false,
     description: 'Muy económico, confiable y rápido con soporte nativo estricto de llamadas a herramientas.',
   },
   {
@@ -25,6 +26,7 @@ export const POPULAR_TOOL_MODELS = [
     outputCostPer1M: 0.4,
     contextLength: 1048576,
     recommended: false,
+    isFree: false,
     description: 'Nueva generación ultrarrápida de Google con soporte nativo de herramientas y 1M de contexto.',
   },
   {
@@ -35,6 +37,7 @@ export const POPULAR_TOOL_MODELS = [
     outputCostPer1M: 4.0,
     contextLength: 200000,
     recommended: false,
+    isFree: false,
     description: 'Ultra rápido, inteligente y económico para razonamiento contextual en tiempo real.',
   },
   {
@@ -45,6 +48,7 @@ export const POPULAR_TOOL_MODELS = [
     outputCostPer1M: 15.0,
     contextLength: 200000,
     recommended: false,
+    isFree: false,
     description: 'Máxima capacidad de razonamiento para casos clínicos y agendas complejas.',
   },
   {
@@ -55,6 +59,7 @@ export const POPULAR_TOOL_MODELS = [
     outputCostPer1M: 10.0,
     contextLength: 128000,
     recommended: false,
+    isFree: false,
     description: 'Modelo insignia multimodelo con excelente soporte de herramientas.',
   },
   {
@@ -65,6 +70,7 @@ export const POPULAR_TOOL_MODELS = [
     outputCostPer1M: 0.4,
     contextLength: 131072,
     recommended: false,
+    isFree: false,
     description: 'Código abierto potente con llamada a herramientas estructuradas.',
   },
   {
@@ -75,6 +81,7 @@ export const POPULAR_TOOL_MODELS = [
     outputCostPer1M: 0,
     contextLength: 1048576,
     recommended: false,
+    isFree: true,
     description: 'Modelo experimental gratuito de Google en OpenRouter. Ideal para pruebas sin costo.',
   },
   {
@@ -85,6 +92,7 @@ export const POPULAR_TOOL_MODELS = [
     outputCostPer1M: 0,
     contextLength: 131072,
     recommended: false,
+    isFree: true,
     description: 'Modelo de Meta de alta capacidad gratuito en OpenRouter. Para pruebas sin coste.',
   },
 ];
@@ -216,9 +224,17 @@ export async function POST(req: Request) {
 
     if (body.action === 'FETCH_OPENROUTER_MODELS') {
       try {
+        const apiKey = await getOpenRouterApiKey();
+        const headers: Record<string, string> = {
+          'Content-Type': 'application/json',
+        };
+        if (apiKey) {
+          headers['Authorization'] = `Bearer ${apiKey}`;
+        }
+
         const res = await fetch('https://openrouter.ai/api/v1/models', {
           method: 'GET',
-          headers: { 'Content-Type': 'application/json' },
+          headers,
           signal: AbortSignal.timeout(15000),
         });
 
@@ -229,22 +245,64 @@ export async function POST(req: Request) {
         const json = await res.json();
         const allModels = json.data || [];
 
-        // Filtrar modelos gratuitos (que contienen :free o pricing.prompt == 0)
-        const freeModels = allModels
-          .filter((m: any) => m.id.endsWith(':free') || m.id.includes(':free') || (m.pricing?.prompt === '0' && m.pricing?.completion === '0'))
-          .map((m: any) => ({
-            id: m.id,
-            name: `${m.name || m.id} (Gratis)`,
-            provider: m.id.split('/')[0] || 'OpenRouter',
-            inputCostPer1M: 0,
-            outputCostPer1M: 0,
-            contextLength: m.context_length || 32768,
-            recommended: false,
-            isFree: true,
-            description: m.description ? m.description.slice(0, 160) + '...' : 'Modelo gratuito sin costo por token.',
-          }));
+        const RECOMMENDED_IDS = new Set([
+          'openai/gpt-4o-mini',
+          'google/gemini-2.0-flash-001',
+          'anthropic/claude-3.5-haiku',
+          'anthropic/claude-3.5-sonnet',
+          'openai/gpt-4o',
+          'meta-llama/llama-3.3-70b-instruct',
+          'google/gemini-2.0-flash-exp:free',
+          'meta-llama/llama-3.3-70b-instruct:free',
+          'deepseek/deepseek-chat',
+        ]);
 
-        return NextResponse.json({ ok: true, models: freeModels, total: allModels.length });
+        const PROVIDER_NAMES: Record<string, string> = {
+          openai: 'OpenAI',
+          google: 'Google',
+          anthropic: 'Anthropic',
+          'meta-llama': 'Meta',
+          mistralai: 'Mistral',
+          deepseek: 'DeepSeek',
+          cohere: 'Cohere',
+          qwen: 'Qwen',
+          amazon: 'Amazon',
+          microsoft: 'Microsoft',
+        };
+
+        const formattedModels = allModels.map((m: any) => {
+          const rawPrompt = parseFloat(m.pricing?.prompt || '0');
+          const rawCompletion = parseFloat(m.pricing?.completion || '0');
+          const inputCostPer1M = +(rawPrompt * 1_000_000).toFixed(4);
+          const outputCostPer1M = +(rawCompletion * 1_000_000).toFixed(4);
+          const isFree = m.id.endsWith(':free') || m.id.includes(':free') || (inputCostPer1M === 0 && outputCostPer1M === 0);
+          const rawProvider = (m.id.split('/')[0] || 'OpenRouter').toLowerCase();
+          const provider = PROVIDER_NAMES[rawProvider] || m.id.split('/')[0] || 'OpenRouter';
+          const isRecommended = RECOMMENDED_IDS.has(m.id);
+
+          return {
+            id: m.id,
+            name: m.name || m.id,
+            provider,
+            inputCostPer1M,
+            outputCostPer1M,
+            contextLength: m.context_length || 32768,
+            recommended: isRecommended,
+            isFree,
+            description: m.description ? m.description.slice(0, 180) + '...' : (isFree ? 'Modelo gratuito sin costo de tokens.' : 'Modelo disponible en OpenRouter.'),
+          };
+        });
+
+        // Ordenar: primero recomendados, luego gratuitos, luego alfabético
+        formattedModels.sort((a: any, b: any) => {
+          if (a.recommended && !b.recommended) return -1;
+          if (!a.recommended && b.recommended) return 1;
+          if (a.isFree && !b.isFree) return -1;
+          if (!a.isFree && b.isFree) return 1;
+          return a.name.localeCompare(b.name);
+        });
+
+        return NextResponse.json({ ok: true, models: formattedModels, total: allModels.length });
       } catch (err: any) {
         return NextResponse.json({ ok: false, error: err?.message || 'Error consultando modelos' }, { status: 500 });
       }
@@ -305,4 +363,3 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: error?.message || 'Error en petición' }, { status: 500 });
   }
 }
-

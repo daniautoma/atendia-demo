@@ -189,6 +189,8 @@ export async function executeToolCall(
         const [year, month, day] = cleanDate.split('-').map(Number);
         const dateObj = new Date(year, month - 1, day, 12, 0, 0);
         const dayOfWeek = dateObj.getDay(); // 0 = Domingo, 1 = Lunes, ..., 6 = Sábado
+        const diasSemana = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+        const nombreDia = diasSemana[dayOfWeek];
 
         // Extraer hora preferida en minutos desde medianoche
         let prefHour = 10;
@@ -202,15 +204,23 @@ export async function executeToolCall(
 
         // 1. RESTRICCIÓN DOMINGO (Cerrado todo el día)
         if (dayOfWeek === 0) {
+          const nextMonday = new Date(year, month - 1, day + 1, 12, 0, 0);
+          const nextMondayIso = nextMonday.toISOString().split('T')[0];
           return {
             result: {
               fecha,
+              diaSemana: 'domingo',
               cerrado: true,
+              motivo: 'La clínica dental permanece cerrada los domingos (no es festivo, es el descanso dominical regular).',
               huecosDisponibles: [],
-              error: 'La clínica está cerrada este día/hora. Obligatorio ofrecer el siguiente día hábil.',
-              mensaje: 'La clínica dental está cerrada los domingos. Obligatorio ofrecer el siguiente día hábil (lunes a partir de las 08:30).',
+              siguienteDiaHabil: {
+                fecha: nextMondayIso,
+                diaSemana: 'lunes',
+                horario: '08:00 a 18:00',
+              },
+              mensaje: `El día ${fecha} es domingo y la clínica está cerrada. El siguiente día hábil disponible es el lunes ${nextMondayIso} a partir de las 08:30.`,
             },
-            summary: `Cerrado: El día ${fecha} es domingo. La clínica está cerrada; no hay citas disponibles los domingos.`,
+            summary: `Cerrado: El día ${fecha} es domingo. La clínica está cerrada; ofrecer el lunes ${nextMondayIso}.`,
           };
         }
 
@@ -218,13 +228,21 @@ export async function executeToolCall(
         if (dayOfWeek === 6) {
           const sabadoHuecos = ['08:30', '09:30', '10:30', '11:30', '12:15'];
           if (prefMinutes >= 13 * 60) {
+            const nextMonday = new Date(year, month - 1, day + 2, 12, 0, 0);
+            const nextMondayIso = nextMonday.toISOString().split('T')[0];
             return {
               result: {
                 fecha,
+                diaSemana: 'sábado',
                 cerrado: true,
+                motivo: 'Los sábados la clínica atiende únicamente en horario matutino de 08:00 a 13:00. Para la hora solicitada ya está cerrada.',
                 huecosDisponibles: [],
-                error: 'La clínica está cerrada este día/hora. Obligatorio ofrecer el siguiente día hábil.',
-                mensaje: `Los sábados la clínica atiende únicamente en horario matutino de 08:00 a 13:00. Para la hora ${horaPreferida} ya está cerrada. Ofrece citas matutinas el sábado o para el lunes.`,
+                siguienteDiaHabil: {
+                  fecha: nextMondayIso,
+                  diaSemana: 'lunes',
+                  horario: '08:00 a 18:00',
+                },
+                mensaje: `Los sábados la atención es matutina (08:00 a 13:00). Para la hora ${horaPreferida} ya está cerrada. Ofrece citas matutinas el sábado o para el lunes ${nextMondayIso}.`,
               },
               summary: `Cerrado: Sábado ${fecha} a las ${horaPreferida} fuera de horario de atención (cierra a las 13:00).`,
             };
@@ -233,6 +251,7 @@ export async function executeToolCall(
           return {
             result: {
               fecha,
+              diaSemana: 'sábado',
               cerrado: false,
               huecosDisponibles: sabadoHuecos,
               horaPreferidaDisponible: sabadoHuecos.includes(horaPreferida),
@@ -248,18 +267,20 @@ export async function executeToolCall(
           return {
             result: {
               fecha,
+              diaSemana: nombreDia,
               cerrado: true,
               huecosDisponibles: [],
-              error: 'La clínica está cerrada este día/hora. Obligatorio ofrecer el siguiente día hábil.',
-              mensaje: `El horario habitual es de lunes a viernes de 08:00 a 18:00. Para la hora solicitada (${horaPreferida}) la clínica se encuentra cerrada. Ofrece citas dentro del horario hábil.`,
+              motivo: `El horario de atención es de 08:00 a 18:00. A las ${horaPreferida} la clínica se encuentra cerrada.`,
+              mensaje: `El horario de atención para los días ${nombreDia} es de 08:00 a 18:00. Para la hora solicitada (${horaPreferida}) la clínica se encuentra cerrada. Ofrece citas dentro del horario hábil.`,
             },
-            summary: `Fuera de horario: ${fecha} a las ${horaPreferida} fuera de horario de atención.`,
+            summary: `Fuera de horario: ${nombreDia} ${fecha} a las ${horaPreferida} fuera de horario de atención.`,
           };
         }
 
         return {
           result: {
             fecha,
+            diaSemana: nombreDia,
             cerrado: false,
             huecosDisponibles: semanaHuecos,
             horaPreferidaDisponible: semanaHuecos.includes(horaPreferida),
